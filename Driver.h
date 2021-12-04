@@ -10,10 +10,12 @@
 #include "SiteManager.h"
 
 class Driver {
-		TransactionManager tm;
-		SiteManager sm;
+		TransactionManager *tm;
+		SiteManager *sm;
 
-		void readLine(istream file);
+		Driver();
+
+		void readLine(string line);
 		void printDump();
 		void queryState();
 		void printValue(Variable var);

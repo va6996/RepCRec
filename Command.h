@@ -15,6 +15,7 @@ public:
 		int startTime;
 		string var;
 		string value;
+		string txnId;
 		Transaction txn;
 };
 

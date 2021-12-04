@@ -8,16 +8,30 @@
 #include <deque>
 #include "Command.h"
 #include "DeadlockManager.h"
+#include "Transaction.h"
+#include "SiteManager.h"
+#include <iostream>
+
+using namespace std;
 
 class TransactionManager {
-		deque<Command> waitQueue;
-		DeadlockManager dm;
+		map<string, list<Command *>> waitQueue;
 
-		void commitTxn(Transaction txn);
-		void abortTxn(Transaction txn);
-		bool executeCmd(Command cmd);
-		void updateGraph(string src, string dst);
-		void detectResolveDeadlock(DeadlockManager dm);
+		DeadlockManager *dm;
+		SiteManager *sm;
+		map<string, Transaction *> txnList;
+public:
+		TransactionManager(SiteManager *siteManager);
+
+		void beingTxn(string txnId, TxnType type, int currTime);
+		void endTxn(string txnId);
+
+		void executeCmd(Command *cmd);
+		void executeRead(Command *cmd);
+		void executeWrite(Command *cmd);
+
+		void detectResolveDeadlock();
+		void checkWaitQueue();
 };
 
 

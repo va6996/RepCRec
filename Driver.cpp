@@ -3,3 +3,9 @@
 //
 
 #include "Driver.h"
+
+Driver::Driver() {
+	sm = new SiteManager();
+	tm = new TransactionManager(sm);
+}
+

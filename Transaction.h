@@ -14,6 +14,7 @@
 class Transaction {
 		int startTime;
 		vector<Lock*> locks;
+		string id;
 		TxnType type;
 
 public:
