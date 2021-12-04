@@ -22,6 +22,7 @@ public:
 		string getSoleLockOwner();
 		int getLockOwnersSize();
 		bool promoteLock();
+		set<string> getTransactions();
 };
 
 

@@ -10,12 +10,13 @@
 #include "Transaction.h"
 
 class Command {
+public:
 		CmdType type;
 		int startTime;
 		string var;
 		string value;
 		Transaction txn;
-}
+};
 
 
 #endif //REPCREC_COMMAND_H

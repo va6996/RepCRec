@@ -40,3 +40,7 @@ bool Lock::promoteLock() {
 	type = Exclusive;
 	return true;
 }
+
+set<string> Lock::getTransactions() {
+	return transactions;
+}

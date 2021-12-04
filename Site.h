@@ -8,17 +8,36 @@
 
 #include "Variable.h"
 #include "LockManager.h"
+#include "SiteStatus.h"
 
 class Site {
 		int nodeId;
-		vector<Variable*> data;
+		SiteStatus status;
+		map<string, Variable*> data;
 		LockManager* lockManager;
 		int lastDownTime;
-		int lastUptime;
+		int lastUpTime;
+
+public:
+		Site(int nodeId, const set<string>& vars);
+
+		void fail();
+
+		void recover();
+
+		LockCodes acquireLock(Command* cmd);
+		LockCodes releaseLock(Command* cmd);
+		bool hasWriteLock(Command *cmd);
 
 		bool isSiteUp();
-		void fail();
-		void recover();
+		string read(Command *cmd);
+		string read(Command *cmd, int time);
+		void stage(Command *cmd);
+		void commit(const string& var);
+		void abort(Transaction *txn);
+		int getLastDownTime();
+		set<string> getConflictingTransactions(Command* cmd);
+		map<string, string> getKeyValues();
 };
 
 

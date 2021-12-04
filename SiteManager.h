@@ -5,14 +5,28 @@
 #ifndef REPCREC_SITEMANAGER_H
 #define REPCREC_SITEMANAGER_H
 
-
+#include <map>
 #include "Site.h"
 
 class SiteManager {
-		vector<Site*> data;
+		map<int, Site*> sites;
+		map<int, set<string>> cfg;
+		map<string, set<int>> reverseCfg;
 
 		void fail(int nodeId);
 		void recover(int nodeId);
+
+public:
+		SiteManager(const map<int, set<string>> &cfg);
+
+		string read(Command *cmd);
+		LockCodes getWriteLock(Command *cmd);
+		set<string> getConflictingLocks(Command *cmd);
+		vector<int> stage(Command *cmd);
+		void abort(Transaction *txn);
+		void commit(Transaction *txn, const set<int>& commitSites, const string& var);
+		bool wasSiteDownAfter(set<int> sites, int time);
+		void dump();
 };
 
 

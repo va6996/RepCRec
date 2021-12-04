@@ -13,9 +13,20 @@
 class LockManager {
 		map<string, Lock*> locks;
 
+public:
 		LockCodes getReadLock(Command* cmd);
+		set<string> testReadLock(Command* cmd);
+
 		LockCodes getWriteLock(Command* cmd);
+		set<string> testWriteLock(Command* cmd);
+
 		LockCodes releaseLock(Command* cmd);
+
+		set<string> getConflictingTransactions(Command* cmd);
+
+		bool hasWriteLock(Command *cmd);
+
+		void releaseAllLocks(Transaction* txn);
 };
 
 

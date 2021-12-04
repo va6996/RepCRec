@@ -7,7 +7,7 @@
 
 
 enum CmdType {
-	R, W
+	Read, Write
 };
 
 

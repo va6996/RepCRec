@@ -8,44 +8,73 @@ LockCodes LockManager::getReadLock(Command* cmd) {
 	Lock *lock = locks[cmd->var];
 
 	if (lock == nullptr) {
-		lock = new Lock(Shared, cmd->var, cmd->txn.id);
+		lock = new Lock(Shared, cmd->var, cmd->txn.getId());
 		locks[cmd->var] = lock;
 		return SharedLockAcquired;
 	}
 
 	if (lock->getLockType() == Exclusive) {
 		// Return highest type of lock type only
-		return lock->getSoleLockOwner() == cmd->txn.id ? ExclusiveLockAcquired : SharedLockFailed;
+		return lock->getSoleLockOwner() == cmd->txn.getId() ? ExclusiveLockAcquired : SharedLockFailed;
 	}
 
-	lock->addTransaction(cmd->txn.id);
+	lock->addTransaction(cmd->txn.getId());
 	return SharedLockAcquired;
+}
+
+set<string> LockManager::testReadLock(Command* cmd) {
+	Lock *lock = locks[cmd->var];
+
+	set<string> conflictingTransactions;
+	if (lock != nullptr && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn.getId())
+			conflictingTransactions.insert(lock->getSoleLockOwner());
+
+	return conflictingTransactions;
 }
 
 LockCodes LockManager::getWriteLock(Command *cmd) {
 	Lock *lock = locks[cmd->var];
 
 	if (lock == nullptr) {
-		lock = new Lock(Exclusive, cmd->var, cmd->txn.id);
+		lock = new Lock(Exclusive, cmd->var, cmd->txn.getId());
 		locks[cmd->var] = lock;
 		return ExclusiveLockAcquired;
 	}
 
 	if (lock->getLockType() == Exclusive) {
 		// Return highest type of lock type only
-		return lock->getSoleLockOwner() == cmd->txn.id ? ExclusiveLockAcquired : ExclusiveLockFailed;
+		return lock->getSoleLockOwner() == cmd->txn.getId() ? ExclusiveLockAcquired : ExclusiveLockFailed;
 	}
 
 	if (lock->getLockOwnersSize() > 1) {
 		return ExclusiveLockFailed;
 	}
 
-	if (lock->getSoleLockOwner() == cmd->txn.id) {
+	if (lock->getSoleLockOwner() == cmd->txn.getId()) {
 		lock->promoteLock();
 		return ExclusiveLockAcquired;
 	}
 
 	return ExclusiveLockFailed;
+}
+
+set<string> LockManager::testWriteLock(Command* cmd) {
+	Lock *lock = locks[cmd->var];
+
+	set<string> conflictingTransactions;
+	if (lock == nullptr)
+		return conflictingTransactions;
+
+	if (lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn.getId()) {
+		// Return highest type of lock type only
+		conflictingTransactions.insert(lock->getSoleLockOwner());
+	}
+
+	if (lock->getLockOwnersSize() > 1) {
+		return lock->getTransactions();
+	}
+
+	return conflictingTransactions;
 }
 
 LockCodes LockManager::releaseLock(Command *cmd) {
@@ -55,7 +84,7 @@ LockCodes LockManager::releaseLock(Command *cmd) {
 		return FatalError;
 	}
 
-	bool result = lock->removeTransaction(cmd->txn.id);
+	bool result = lock->removeTransaction(cmd->txn.getId());
 
 	if (!result) {
 		return FatalError;
@@ -69,4 +98,26 @@ LockCodes LockManager::releaseLock(Command *cmd) {
 	}
 
 	return SharedLockReleased;
+}
+
+bool LockManager::hasWriteLock(Command *cmd) {
+	Lock *lock = locks[cmd->var];
+	if (lock == nullptr) return false;
+	if (lock->getLockType() != Exclusive) return false;
+	if (lock->getSoleLockOwner() != cmd->txn.getId()) return false;
+	return true;
+}
+
+void LockManager::releaseAllLocks(Transaction* txn) {
+	for (auto it = locks.begin(); it!= locks.end(); it++) {
+		it->second->removeTransaction(txn->getId());
+	}
+}
+
+set<string> LockManager::getConflictingTransactions(Command *cmd) {
+	if (cmd->type == Read) {
+		return testReadLock(cmd);
+	} else {
+		return testWriteLock(cmd);
+	}
 }
