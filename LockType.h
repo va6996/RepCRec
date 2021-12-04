@@ -7,7 +7,7 @@
 
 
 enum LockType {
-	S, X
+	Shared, Exclusive
 };
 
 

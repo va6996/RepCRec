@@ -5,16 +5,17 @@
 #ifndef REPCREC_LOCKMANAGER_H
 #define REPCREC_LOCKMANAGER_H
 
-
+#include <map>
 #include "Lock.h"
 #include "Command.h"
+#include "LockCodes.h"
 
 class LockManager {
-		vector<Lock*> locks;
+		map<string, Lock*> locks;
 
-		bool getReadLock(Command cmd);
-		bool getWriteLock(Command cmd);
-		bool releaseLock(Lock lock);
+		LockCodes getReadLock(Command* cmd);
+		LockCodes getWriteLock(Command* cmd);
+		LockCodes releaseLock(Command* cmd);
 };
 
 
