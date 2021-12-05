@@ -16,13 +16,20 @@ void Site::recover() {
 	status = Up;
 	lockManager = new LockManager();
 	lastUpTime = GlobalClock::getTime();
+
+	for (auto it: data) {
+		if (singleOwner.find(it.first) == singleOwner.end()) {
+			it.second->markStale();
+		}
+	}
 }
 
 bool Site::isSiteUp() {
 	return status == Up;
 }
 
-Site::Site(int nodeId, const set<string>& vars) : nodeId(nodeId){
+Site::Site(int nodeId, const set<string>& vars, const set<string> &singleOwnerVars) : nodeId(nodeId){
+	singleOwner = singleOwnerVars;
 	lastUpTime = GlobalClock::getTime();
 	lastDownTime = -1;
 	status = Up;
@@ -35,6 +42,9 @@ Site::Site(int nodeId, const set<string>& vars) : nodeId(nodeId){
 
 LockCodes Site::acquireLock(Command* cmd) {
 	if (cmd->type == Read) {
+		if (data[cmd->var]->isDataStale()) {
+			return StaleData;
+		}
 		return lockManager->getReadLock(cmd);
 	}
 

@@ -43,7 +43,6 @@ string SiteManager::read(Command *cmd) {
 				sites[site]->read(cmd, cmd->txn.getStartTime());
 			} else {
 				// Same lock is acquired for multiple access to same variables in a transaction
-
 				LockCodes result = sites[site]->acquireLock(cmd);
 				if (result == SharedLockAcquired || result == ExclusiveLockAcquired) {
 					return sites[site]->read(cmd);
@@ -103,8 +102,8 @@ vector<int> SiteManager::stage(Command *cmd) {
 }
 
 void SiteManager::abort(Transaction *txn) {
-	for (auto it = sites.begin(); it != sites.end(); it++) {
-		it->second->abort(txn);
+	for (auto & site : sites) {
+		site.second->abort(txn);
 	}
 }
 
@@ -115,8 +114,8 @@ void SiteManager::commit(Transaction *txn, const set<int>& commitSites, const st
 }
 
 bool SiteManager::wasSiteDownAfter(set<int> siteList, int time) {
-	for (auto it=sites.begin(); it != sites.end(); it++) {
-		if (siteList.find(it->first) != siteList.end() && it->second->getLastDownTime() >= time) return true;
+	for (auto & site : sites) {
+		if (siteList.find(site.first) != siteList.end() && site.second->getLastDownTime() >= time) return true;
 	}
 
 	return false;
@@ -125,14 +124,14 @@ bool SiteManager::wasSiteDownAfter(set<int> siteList, int time) {
 void SiteManager::dump() {
 	ostringstream ss;
 
-	for (auto it=sites.begin(); it != sites.end(); it++) {
-		map<string, string> siteData = it->second->getKeyValues();
+	for (auto & site : sites) {
+		map<string, string> siteData = site.second->getKeyValues();
 
-		ss << "site " << it->first << ":- ";
+		ss << "site " << site.first << ":- ";
 
-		vector<string> stringData;
-		for (auto itt=siteData.begin(); itt != siteData.end(); itt++) {
-			stringData.push_back(itt->first + ": " + itt->second);
+		vector<string> stringData(siteData.size());
+		for (auto & itt : siteData) {
+			stringData.push_back(itt.first + ": " + itt.second);
 		}
 
 		copy(stringData.begin(), stringData.end(), ostream_iterator<string>(ss, ", "));
@@ -143,11 +142,26 @@ void SiteManager::dump() {
 }
 
 SiteManager::SiteManager(const map<int, set<string>> &cfg) : cfg(cfg) {
-	for (auto it=cfg.begin(); it != cfg.end(); it++) {
-		for (const string& var : it->second) {
-			reverseCfg[var].insert(it->first);
-		}
 
-		sites[it->first] = new Site(it->first, it->second);
+	for (const auto &it : cfg) {
+		for (const string &var: it.second) {
+			if (reverseCfg[var].empty()) {
+				reverseCfg[var] = {};
+			}
+			reverseCfg[var].insert(it.first);
+		}
+	}
+
+	for (const auto &it: reverseCfg) {
+		if (it.second.size() == 1) {
+			if (soleOwner[*it.second.begin()].empty()) {
+				soleOwner[*it.second.begin()] = {};
+			}
+			soleOwner[*it.second.begin()].insert(it.first);
+		}
+	}
+
+	for (const auto & it : cfg) {
+		sites[it.first] = new Site(it.first, it.second, soleOwner[it.first]);
 	}
 }

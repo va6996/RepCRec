@@ -26,10 +26,20 @@ void Variable::stageValue(string newValue) {
 
 void Variable::commitStagedValue() {
 	value.emplace_back(stagingTime, stagedValue);
+	isStale = false;
 }
 
 Variable::Variable(string var, string data) : var(std::move(var)) {
 	value.emplace_back(0, std::move(data));
+	isStale = false;
+}
+
+void Variable::markStale() {
+	isStale = true;
+}
+
+bool Variable::isDataStale() {
+	return isStale;
 }
 
 

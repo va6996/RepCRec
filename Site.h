@@ -14,12 +14,13 @@ class Site {
 		int nodeId;
 		SiteStatus status;
 		map<string, Variable*> data;
+		set<string> singleOwner;
 		LockManager* lockManager;
 		int lastDownTime;
 		int lastUpTime;
 
 public:
-		Site(int nodeId, const set<string>& vars);
+		Site(int nodeId, const set<string>& vars, const set<string> &singleOwnerVars);
 
 		void fail();
 

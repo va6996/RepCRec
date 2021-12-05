@@ -11,6 +11,7 @@
 class SiteManager {
 		map<int, Site*> sites;
 		map<int, set<string>> cfg;
+		map<int, set<string>> soleOwner;
 		map<string, set<int>> reverseCfg;
 
 		void fail(int nodeId);

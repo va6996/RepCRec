@@ -7,7 +7,7 @@
 
 
 enum CmdType {
-	Read, Write
+	Read, Write, Begin, End, Fail, Recover, BeginRO, None
 };
 
 

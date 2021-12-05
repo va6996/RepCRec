@@ -26,6 +26,7 @@ set<string> LockManager::testReadLock(Command* cmd) {
 	Lock *lock = locks[cmd->var];
 
 	set<string> conflictingTransactions;
+	// Will read locks ever conflict?
 	if (lock != nullptr && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn.getId())
 			conflictingTransactions.insert(lock->getSoleLockOwner());
 
@@ -109,8 +110,8 @@ bool LockManager::hasWriteLock(Command *cmd) {
 }
 
 void LockManager::releaseAllLocks(Transaction* txn) {
-	for (auto it = locks.begin(); it!= locks.end(); it++) {
-		it->second->removeTransaction(txn->getId());
+	for (auto & lock : locks) {
+		lock.second->removeTransaction(txn->getId());
 	}
 }
 

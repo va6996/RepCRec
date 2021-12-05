@@ -5,7 +5,74 @@
 #include "Driver.h"
 
 Driver::Driver() {
-	sm = new SiteManager();
+	map<int, set<string>> cfg;
+
+	for (int i = 0; i < 10; i++) {
+		cfg[i] = {};
+	}
+
+	for (int i = 1; i <= 20; i++) {
+		if (i & 1) {
+			cfg[(i % 10) + 1].insert('x' + to_string(i));
+		} else {
+			for (int j = 1; j <= 10; j++) {
+				cfg[j].insert('x' + to_string(i));
+			}
+		}
+	}
+	sm = new SiteManager(cfg);
 	tm = new TransactionManager(sm);
+}
+
+void Driver::processLine(const string& line) {
+	tm->beforeCommandChecks();
+
+	vector<string> tokens = getArgs(line);
+	if(tokens.size() != 0){
+		if (tokens[0] == "beginRO") {
+			tm->beingTxn(tokens[1], RO, gc->getTime());
+		} else if (tokens[0] == "begin") {
+			tm->beingTxn(tokens[1], RW, gc->getTime());
+		} else if (tokens[0] == "end") {
+			tm->endTxn(tokens[1]);
+		} else if (tokens[0] == "W") {
+			Command *cmd = new Command();
+			cmd->txnId = tokens[1];
+			cmd->startTime = gc->getTime();
+			cmd->txn = tm->getTxn(cmd->txnId);
+			cmd->type = Write;
+			cmd->var = tokens[2];
+			cmd->value = tokens[3];
+
+			tm->executeCmd(cmd);
+		} else if (tokens[0] == "R") {
+			Command *cmd = new Command();
+			cmd->txnId = tokens[1];
+			cmd->startTime = gc->getTime();
+			cmd->txn = tm->getTxn(cmd->txnId);
+			cmd->type = Read;
+			cmd->var = tokens[2];
+
+			tm->executeCmd(cmd);
+		} else if (tokens[0] == "fail") {
+			sm->fail(atoi(&tokens[1][0]));
+		} else if (tokens[0] == "recover") {
+			sm->recover(atoi(&tokens[1][0]));
+		} else if (tokens[0] == "dump") {
+			sm->dump();
+		}
+	}
+
+	gc->tick();
+}
+
+vector<string> Driver::getArgs(string str) {
+	char *tokens = strtok(&str[0], " (,)\n");
+	vector<string> args;
+	while(tokens!=NULL){
+		args.push_back(string(tokens));
+		tokens = strtok(NULL, "(,)");
+	}
+	return args;
 }
 

@@ -15,6 +15,7 @@ class Variable {
 		vector<pair<int, string>> value;
 		string stagedValue;
 		int stagingTime;
+		bool isStale;
 
 public:
 		Variable(string var, string value);
@@ -23,6 +24,9 @@ public:
 		string getLatestValue(int time);
 		void stageValue(string newValue);
 		void commitStagedValue();
+
+		void markStale();
+		bool isDataStale();
 };
 
 #endif //REPCREC_VARIABLE_H

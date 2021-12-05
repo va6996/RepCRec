@@ -15,7 +15,7 @@ class Driver {
 
 		Driver();
 
-		void readLine(string line);
+		void processLine(const string& line);
 		void printDump();
 		void queryState();
 		void printValue(Variable var);

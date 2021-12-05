@@ -10,7 +10,7 @@ enum LockCodes {
 	SharedLockFailed, ExclusiveLockFailed,
 	SharedLockAcquired, ExclusiveLockAcquired,
 	SharedLockReleased, ExclusiveLockReleased,
-	FatalError
+	FatalError, StaleData
 };
 
 
