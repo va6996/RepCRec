@@ -36,7 +36,8 @@ Site::Site(int nodeId, const set<string>& vars, const set<string> &singleOwnerVa
 	lockManager = new LockManager();
 	// Add init for all variables
 	for (const string& var : vars) {
-		data[var] = new Variable(var, to_string(nodeId*10));
+		int varNo = atoi(var.substr(1).c_str());
+		data[var] = new Variable(var, to_string(varNo*10));
 	}
 }
 

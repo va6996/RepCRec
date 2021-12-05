@@ -122,6 +122,15 @@ bool SiteManager::wasSiteDownAfter(set<int> siteList, int time) {
 
 	return false;
 }
+bool dataSort(const string& a, const string& b) {
+	int k1 = a.find(':');
+	int varNo1 = atoi(a.substr(1, k1-1).c_str());
+
+	int k2 = b.find(':');
+	int varNo2 = atoi(b.substr(1, k2-1).c_str());
+
+	return varNo1 < varNo2;
+}
 
 void SiteManager::dump() {
 	ostringstream ss;
@@ -131,11 +140,11 @@ void SiteManager::dump() {
 
 		ss << "site " << site.first << ":- ";
 
-		vector<string> stringData(siteData.size());
+		vector<string> stringData;
 		for (auto & itt : siteData) {
 			stringData.push_back(itt.first + ": " + itt.second);
 		}
-
+		sort(stringData.begin(), stringData.end(), dataSort);
 		copy(stringData.begin(), stringData.end(), ostream_iterator<string>(ss, ", "));
 		ss << endl;
 	}
