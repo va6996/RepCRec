@@ -22,10 +22,12 @@ void TransactionManager::executeCmd(Command *cmd) {
 
 void TransactionManager::executeRead(Command *cmd){
 	string val = sm->read(cmd);
+    cout<<cmd->txnId<<(cmd->txn->getTxnType()==RO?" ReadOnly Txn,":" ReadWrite Txn,")<<" Reading "<<cmd->var<<"\n";
 	if(val != "")
-		cout<<cmd->var<<": "<<val<<"\n";
+        cout<<cmd->txnId<<" Reading "<<cmd->var<<": "<<val<<"\n";
 	else {
-		set<string> conflictingTxn = sm->getConflictingLocks(cmd);
+        cout<<cmd->txnId<<" Reading "<<cmd->var<<" Failed\n";
+        set<string> conflictingTxn = sm->getConflictingLocks(cmd);
 		for(set<string>::iterator it = conflictingTxn.begin(); it != conflictingTxn.end(); it++) {
 			dm->addEdge(cmd->txnId, *it);
 		}
@@ -44,11 +46,13 @@ void TransactionManager::executeRead(Command *cmd){
 }
 
 void TransactionManager::executeWrite(Command *cmd){
+    cout<<cmd->txnId<<" Writing "<<cmd->var<<"\n";
 	if(sm->getWriteLock(cmd) == ExclusiveLockAcquired){
-        cout<<cmd->txnId<<" Written\n";
-		vector<int> writeSite = sm->stage(cmd);
+        cout<<cmd->txnId<<" "<<cmd->var<<" Written, Value:"<<cmd->value<<"\n";
+        vector<int> writeSite = sm->stage(cmd);
 		txnList[cmd->txnId]->addSites(cmd->var, writeSite);
 	} else {
+        cout<<cmd->txnId<<" Writing "<<cmd->var<<" Failed\n";
 		set<string> conflictingTxn = sm->getConflictingLocks(cmd);
 		for(set<string>::iterator it = conflictingTxn.begin(); it != conflictingTxn.end(); it++) {
 			dm->addEdge(cmd->txnId, *it);
@@ -73,7 +77,7 @@ void TransactionManager::detectResolveDeadlock(){
 		sm->abort(txnList[txn]);
 		dm->removeTransaction(txn);
 		txnList[txn]->isEnded = true;
-		cout<<txn<<" Aborted\n";
+		cout<<txn<<" Aborted due to deadlock\n";
 	}
 }
 
@@ -95,7 +99,7 @@ void TransactionManager::endTxn(string txnId) {
 		cout<<txnId<<" Commited\n";
 	} else {
 		sm->abort(txn);
-		cout<<txnId<<" Aborted\n";
+		cout<<txnId<<" Aborted as a site failed\n";
 	}
 	dm->removeTransaction(txnId);
 }
@@ -105,7 +109,6 @@ void TransactionManager::checkWaitQueue() {
 		list<Command *>::iterator it1;
 		for (it1 = it->second.begin(); it1 != it->second.end(); it1++) {
 			Transaction *txn = txnList[(*it1)->txnId];
-            cout<<txn->getId()<<"   "<<(*it1)->var<<"        "<<txn->isEnded<<"*****************************\n";
 			if(!txn->isEnded){
 				if((*it1)->type == Read){
 					string val = sm->read(*it1);
@@ -115,15 +118,13 @@ void TransactionManager::checkWaitQueue() {
 					}
 				} else {
 					Command *cmd = *it1;
-                    cout<<cmd->txnId<<" /*///////////\n";
                     LockCodes lockType = sm->getWriteLock(cmd);
 					if(lockType == ExclusiveLockAcquired){
-                        cout<<cmd->txnId<<" Written\n";
+                        cout<<cmd->txnId<<" "<<cmd->var<<" Written, Value:"<<cmd->value<<"\n";
                         vector<int> writeSite = sm->stage(cmd);
 						txnList[cmd->txnId]->addSites(cmd->var, writeSite);
 						break;
 					} else if(lockType == ExclusiveLockFailed){
-                        cout<<cmd->txnId<<" Failed\n";
                     }
 				}
 			}

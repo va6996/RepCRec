@@ -40,7 +40,9 @@ string SiteManager::read(Command *cmd) {
 	for (int site: siteList) {
 		if (sites[site]->isSiteUp()) {
 			if (cmd->txn->getTxnType() == RO) {
-				sites[site]->read(cmd, cmd->txn->getStartTime());
+				string res = sites[site]->read(cmd, cmd->txn->getStartTime());
+                if(res!="")
+                    return res;
 			} else {
 				// Same lock is acquired for multiple access to same variables in a transaction
 				LockCodes result = sites[site]->acquireLock(cmd);

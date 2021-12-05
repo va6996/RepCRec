@@ -42,6 +42,12 @@ LockCodes LockManager::getWriteLock(Command *cmd) {
 		return ExclusiveLockAcquired;
 	}
 
+    if(lock->getLockOwnersSize()==0){
+        lock->addTransaction(cmd->txnId);
+        locks[cmd->var] = lock;
+        return ExclusiveLockAcquired;
+    }
+
 	if (lock->getLockType() == Exclusive) {
 		// Return highest type of lock type only
 		return lock->getSoleLockOwner() == cmd->txn->getId() ? ExclusiveLockAcquired : ExclusiveLockFailed;

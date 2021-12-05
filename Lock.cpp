@@ -29,10 +29,8 @@ LockType Lock::getLockType() {
 }
 
 string Lock::getSoleLockOwner() {
-//	assert(transactions.size() == 1);
-    if(transactions.size() >= 1)
-	    return *transactions.begin();
-    return "";
+	assert(transactions.size() == 1);
+    return *transactions.begin();
 }
 
 int Lock::getLockOwnersSize() {
