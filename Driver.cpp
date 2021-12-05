@@ -22,7 +22,7 @@ Driver::Driver() {
 	}
 	sm = new SiteManager(cfg);
 	tm = new TransactionManager(sm);
-	gc = new GlobalClock();
+//	gc = new GlobalClock();
 }
 
 void Driver::processLine(const string& line) {
@@ -31,15 +31,15 @@ void Driver::processLine(const string& line) {
 	vector<string> tokens = getArgs(line);
 	if(tokens.size() != 0){
 		if (tokens[0] == "beginRO") {
-			tm->beingTxn(tokens[1], RO, gc->getTime());
+			tm->beingTxn(tokens[1], RO, GlobalClock::getTime());
 		} else if (tokens[0] == "begin") {
-			tm->beingTxn(tokens[1], RW, gc->getTime());
+			tm->beingTxn(tokens[1], RW, GlobalClock::getTime());
 		} else if (tokens[0] == "end") {
 			tm->endTxn(tokens[1]);
 		} else if (tokens[0] == "W") {
 			Command *cmd = new Command();
 			cmd->txnId = tokens[1];
-			cmd->startTime = gc->getTime();
+			cmd->startTime = GlobalClock::getTime();
 			cmd->txn = tm->getTxn(cmd->txnId);
 			cmd->type = Write;
 			cmd->var = tokens[2];
@@ -49,7 +49,7 @@ void Driver::processLine(const string& line) {
 		} else if (tokens[0] == "R") {
 			Command *cmd = new Command();
 			cmd->txnId = tokens[1];
-			cmd->startTime = gc->getTime();
+			cmd->startTime = GlobalClock::getTime();
 			cmd->txn = tm->getTxn(cmd->txnId);
 			cmd->type = Read;
 			cmd->var = tokens[2];
@@ -64,7 +64,7 @@ void Driver::processLine(const string& line) {
 		}
 	}
 
-	gc->tick();
+    GlobalClock::tick();
 }
 
 vector<string> Driver::getArgs(string str) {

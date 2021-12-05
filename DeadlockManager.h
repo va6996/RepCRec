@@ -9,6 +9,8 @@
 #include <map>
 #include <set>
 #include "Transaction.h"
+#include "iostream"
+using namespace std;
 
 class DeadlockManager {
 		map<string, set<string>> adjacencyList;
@@ -19,7 +21,7 @@ public:
 		void removeTransaction(string txn);
 		bool isCycleRec(string txn, map<string, bool> &visited, map<string, bool> &recStack);
 		bool detectDeadlock();
-		string minTransRec(string txn, map<string, bool> &visited, map<string, bool> &recStack, map<string, Transaction *> &txnDetails);
+        vector<string> minTransRec(string txn, map<string, bool> &visited, map<string, bool> &recStack, map<string, Transaction *> &txnDetails, vector<string> currP);
 		string resolveDeadlock(map<string, Transaction*> &txn);
 };
 

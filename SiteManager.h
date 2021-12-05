@@ -7,6 +7,7 @@
 
 #include <map>
 #include "Site.h"
+#include <iterator>
 
 class SiteManager {
 		map<int, Site*> sites;

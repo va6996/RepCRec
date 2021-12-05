@@ -4,6 +4,4 @@
 
 #include "GlobalClock.h"
 
-GlobalClock::GlobalClock() {
-	time = 0;
-}
+int GlobalClock::time = 0;

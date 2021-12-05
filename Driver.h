@@ -9,11 +9,13 @@
 #include "TransactionManager.h"
 #include "SiteManager.h"
 #include "GlobalClock.h"
+#include <string.h>
+
 
 class Driver {
 		TransactionManager *tm;
 		SiteManager *sm;
-		GlobalClock *gc;
+//		GlobalClock *gc;
 		vector<string> getArgs(string str);
 
 public:

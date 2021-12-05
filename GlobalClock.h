@@ -4,21 +4,20 @@
 
 #ifndef REPCREC_GLOBALCLOCK_H
 #define REPCREC_GLOBALCLOCK_H
-
+#include "iostream"
+using namespace  std;
 
 class GlobalClock {
-	static int time;
-
 public:
-		GlobalClock();
+    static int time;
+    static void tick() {
+        time++;
+        cout<<"---------------Time "<<time<<"---------------\n";
+    }
 
-		void tick() {
-			time++;
-		}
-
-		static int getTime() {
-			return time;
-		}
+    static int getTime() {
+        return time;
+    }
 };
 
 

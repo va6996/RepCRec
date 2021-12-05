@@ -44,7 +44,8 @@ void TransactionManager::executeRead(Command *cmd){
 }
 
 void TransactionManager::executeWrite(Command *cmd){
-	if(sm->getWriteLock(cmd) == SharedLockAcquired){
+	if(sm->getWriteLock(cmd) == ExclusiveLockAcquired){
+        cout<<cmd->txnId<<" Written\n";
 		vector<int> writeSite = sm->stage(cmd);
 		txnList[cmd->txnId]->addSites(cmd->var, writeSite);
 	} else {
@@ -104,6 +105,7 @@ void TransactionManager::checkWaitQueue() {
 		list<Command *>::iterator it1;
 		for (it1 = it->second.begin(); it1 != it->second.end(); it1++) {
 			Transaction *txn = txnList[(*it1)->txnId];
+            cout<<txn->getId()<<"   "<<(*it1)->var<<"        "<<txn->isEnded<<"*****************************\n";
 			if(!txn->isEnded){
 				if((*it1)->type == Read){
 					string val = sm->read(*it1);
@@ -113,11 +115,16 @@ void TransactionManager::checkWaitQueue() {
 					}
 				} else {
 					Command *cmd = *it1;
-					if(sm->getWriteLock(cmd) == SharedLockAcquired){
-						vector<int> writeSite = sm->stage(cmd);
+                    cout<<cmd->txnId<<" /*///////////\n";
+                    LockCodes lockType = sm->getWriteLock(cmd);
+					if(lockType == ExclusiveLockAcquired){
+                        cout<<cmd->txnId<<" Written\n";
+                        vector<int> writeSite = sm->stage(cmd);
 						txnList[cmd->txnId]->addSites(cmd->var, writeSite);
 						break;
-					}
+					} else if(lockType == ExclusiveLockFailed){
+                        cout<<cmd->txnId<<" Failed\n";
+                    }
 				}
 			}
 		}

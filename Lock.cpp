@@ -5,6 +5,7 @@
 #include "Lock.h"
 
 #include <utility>
+#include <assert.h>
 
 Lock::Lock(LockType type, string var, const string& txnId) : type(type), var(std::move(var)) {
 	transactions.insert(txnId);
@@ -28,8 +29,10 @@ LockType Lock::getLockType() {
 }
 
 string Lock::getSoleLockOwner() {
-	assert(transactions.size() == 1);
-	return *transactions.begin();
+//	assert(transactions.size() == 1);
+    if(transactions.size() >= 1)
+	    return *transactions.begin();
+    return "";
 }
 
 int Lock::getLockOwnersSize() {
