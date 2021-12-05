@@ -25,6 +25,11 @@ void TransactionManager::executeRead(Command *cmd){
 	if(val != "")
 		cout<<cmd->var<<": "<<val<<"\n";
 	else {
+		set<string> conflictingTxn = sm->getConflictingLocks(cmd);
+		for(set<string>::iterator it = conflictingTxn.begin(); it != conflictingTxn.end(); it++) {
+			dm->addEdge(cmd->txnId, *it);
+		}
+
 		if(waitQueue.count(cmd->var)){
 			for(list<Command *>::iterator it = waitQueue[cmd->var].begin(); it != waitQueue[cmd->var].end(); it++){
 				dm->addEdge(cmd->txnId, (*it)->txnId);
@@ -43,8 +48,8 @@ void TransactionManager::executeWrite(Command *cmd){
 		vector<int> writeSite = sm->stage(cmd);
 		txnList[cmd->txnId]->addSites(cmd->var, writeSite);
 	} else {
-		set<string> txnList = sm->getConflictingLocks(cmd);
-		for(set<string>::iterator it = txnList.begin(); it != txnList.end(); it++) {
+		set<string> conflictingTxn = sm->getConflictingLocks(cmd);
+		for(set<string>::iterator it = conflictingTxn.begin(); it != conflictingTxn.end(); it++) {
 			dm->addEdge(cmd->txnId, *it);
 		}
 
@@ -119,4 +124,15 @@ void TransactionManager::checkWaitQueue() {
 		if(it1 != it->second.end())
 			it->second.erase(it1);
 	}
+}
+
+void TransactionManager::beforeCommandChecks(){
+	detectResolveDeadlock();
+	checkWaitQueue();
+}
+
+Transaction * TransactionManager::getTxn(string txnId){
+	if(txnList.count(txnId))
+		return txnList[txnId];
+	return NULL;
 }

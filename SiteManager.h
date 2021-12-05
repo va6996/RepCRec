@@ -13,10 +13,6 @@ class SiteManager {
 		map<int, set<string>> cfg;
 		map<int, set<string>> soleOwner;
 		map<string, set<int>> reverseCfg;
-
-		void fail(int nodeId);
-		void recover(int nodeId);
-
 public:
 		SiteManager(const map<int, set<string>> &cfg);
 
@@ -28,7 +24,9 @@ public:
 		void commit(Transaction *txn, const set<int>& commitSites, const string& var);
 		bool wasSiteDownAfter(set<int> sites, int time);
 		void dump();
-};
+
+		void fail(int nodeId);
+		void recover(int nodeId);};
 
 
 #endif //REPCREC_SITEMANAGER_H

@@ -20,18 +20,19 @@ class TransactionManager {
 		DeadlockManager *dm;
 		SiteManager *sm;
 		map<string, Transaction *> txnList;
+
+		void executeRead(Command *cmd);
+		void executeWrite(Command *cmd);
+		void detectResolveDeadlock();
+		void checkWaitQueue();
 public:
 		TransactionManager(SiteManager *siteManager);
 
 		void beingTxn(string txnId, TxnType type, int currTime);
 		void endTxn(string txnId);
-
 		void executeCmd(Command *cmd);
-		void executeRead(Command *cmd);
-		void executeWrite(Command *cmd);
-
-		void detectResolveDeadlock();
-		void checkWaitQueue();
+		void beforeCommandChecks();
+		Transaction *getTxn(string txnId);
 };
 
 

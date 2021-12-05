@@ -10,6 +10,8 @@ class GlobalClock {
 	static int time;
 
 public:
+		GlobalClock();
+
 		void tick() {
 			time++;
 		}

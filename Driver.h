@@ -8,11 +8,15 @@
 
 #include "TransactionManager.h"
 #include "SiteManager.h"
+#include "GlobalClock.h"
 
 class Driver {
 		TransactionManager *tm;
 		SiteManager *sm;
+		GlobalClock *gc;
+		vector<string> getArgs(string str);
 
+public:
 		Driver();
 
 		void processLine(const string& line);

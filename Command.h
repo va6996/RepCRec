@@ -11,12 +11,19 @@
 
 class Command {
 public:
+		Command() {
+			var = "";
+			value = "";
+			txnId = "";
+			txn = NULL;
+		}
+
 		CmdType type;
 		int startTime;
 		string var;
 		string value;
 		string txnId;
-		Transaction txn;
+		Transaction *txn;
 };
 
 

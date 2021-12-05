@@ -22,6 +22,7 @@ Driver::Driver() {
 	}
 	sm = new SiteManager(cfg);
 	tm = new TransactionManager(sm);
+	gc = new GlobalClock();
 }
 
 void Driver::processLine(const string& line) {
