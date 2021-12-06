@@ -7,13 +7,10 @@ int main(int argc, char** argv) {
 	if(argc<2)
 		cout<<"FileName Missing\n";
 
-//    cout<<argv[1]<<"=====\n";
-//    ifstream inp(argv[1]);
-    ifstream inp("input/test21");
+    ifstream inp(argv[1]);
 	if(inp.is_open()){
 		string line;
 		while(getline(inp, line)) {
-//            cout<<line<<"\n";
 			d->processLine(line);
 		}
 	}

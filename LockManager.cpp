@@ -50,8 +50,13 @@ LockCodes LockManager::getWriteLock(Command *cmd) {
 	}
 
     if(lock->getLockOwnersSize()==0){
-        lock->addTransaction(cmd->txnId);
-        locks[cmd->var] = lock;
+        if(lock->getLockType() != Exclusive){
+            free(lock);
+            locks[cmd->var] = new Lock(Exclusive, cmd->var, cmd->txnId);
+        } else {
+            lock->addTransaction(cmd->txnId);
+            locks[cmd->var] = lock;
+        }
         return ExclusiveLockAcquired;
     }
 
