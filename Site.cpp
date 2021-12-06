@@ -78,7 +78,7 @@ void Site::commit(const string& var) {
 }
 
 void Site::abort(Transaction *txn) {
-	lockManager->releaseAllLocks(txn);
+    lockManager->releaseAllLocks(txn);
 }
 
 int Site::getLastDownTime() {

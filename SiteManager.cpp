@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 #include "SiteManager.h"
 
 using namespace std;
@@ -19,6 +20,7 @@ void SiteManager::fail(int nodeId) {
 	}
 
 	site->fail();
+    cout<<"Site "<<nodeId<<" Failed\n";
 }
 
 void SiteManager::recover(int nodeId) {
@@ -32,14 +34,14 @@ void SiteManager::recover(int nodeId) {
 	}
 
 	site->recover();
+    cout<<"Site "<<nodeId<<" Recovered\n";
 }
 
 string SiteManager::read(Command *cmd) {
 	set<int> siteList = reverseCfg[cmd->var];
-
 	for (int site: siteList) {
-		if (sites[site]->isSiteUp()) {
-			if (cmd->txn->getTxnType() == RO) {
+        if (sites[site]->isSiteUp()) {
+            if (cmd->txn->getTxnType() == RO) {
 				string res = sites[site]->read(cmd, cmd->txn->getStartTime());
                 if(res!="")
                     return res;
@@ -105,7 +107,7 @@ vector<int> SiteManager::stage(Command *cmd) {
 
 void SiteManager::abort(Transaction *txn) {
 	for (auto & site : sites) {
-		site.second->abort(txn);
+        site.second->abort(txn);
 	}
 }
 
@@ -138,6 +140,8 @@ void SiteManager::dump() {
 	for (auto & site : sites) {
 		map<string, string> siteData = site.second->getKeyValues();
 
+        if(site.first==0)
+            continue;
 		ss << "site " << site.first << ":- ";
 
 		vector<string> stringData;

@@ -19,13 +19,15 @@ class Transaction {
 
 public:
 		map<string, set<int>> variableSite;
-		bool isEnded;
+        map<string, int> variableWriteTime;
+        bool isEnded;
 
 		Transaction(string Id, int currTime, TxnType newType);
 		int getStartTime();
 		TxnType getTxnType();
 		string getId();
 		void addSites(string variable, vector<int> sites);
+        void addWriteTimes(string variable, int currTime);
 };
 
 

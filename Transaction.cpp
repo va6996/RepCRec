@@ -2,6 +2,7 @@
 // Created by Vinayak Agarwal on 12/4/21.
 //
 
+#include <iostream>
 #include "Transaction.h"
 
 Transaction::Transaction(string Id, int currTime, TxnType newType) {
@@ -31,5 +32,11 @@ void Transaction::addSites(string variable, vector<int> sites){
 
 	for(int i=0;i<sites.size();i++){
 		variableSite[variable].insert((sites[i]));
+	}
+}
+
+void Transaction::addWriteTimes(string variable, int currTime) {
+	if(!variableWriteTime.count(variable)){
+		variableWriteTime.insert(make_pair(variable, currTime));
 	}
 }

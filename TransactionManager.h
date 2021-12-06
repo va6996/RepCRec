@@ -11,11 +11,12 @@
 #include "Transaction.h"
 #include "SiteManager.h"
 #include <iostream>
+#include "GlobalClock.h"
 
 using namespace std;
 
 class TransactionManager {
-		map<string, list<Command *>> waitQueue;
+		map<string, list<Command *> *> waitQueue;
 
 		DeadlockManager *dm;
 		SiteManager *sm;

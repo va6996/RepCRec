@@ -72,7 +72,7 @@ vector<string> Driver::getArgs(string str) {
 	vector<string> args;
 	while(tokens!=NULL){
 		args.push_back(string(tokens));
-		tokens = strtok(NULL, "(,)");
+		tokens = strtok(NULL, " (,)\n");
 	}
 	return args;
 }

@@ -2,6 +2,7 @@
 // Created by Vinayak Agarwal on 12/4/21.
 //
 
+#include <iostream>
 #include "LockManager.h"
 
 LockCodes LockManager::getReadLock(Command* cmd) {
@@ -12,6 +13,12 @@ LockCodes LockManager::getReadLock(Command* cmd) {
 		locks[cmd->var] = lock;
 		return SharedLockAcquired;
 	}
+
+    if(lock->getLockOwnersSize()==0){
+        lock->addTransaction(cmd->txnId);
+        locks[cmd->var] = lock;
+        return SharedLockAcquired;
+    }
 
 	if (lock->getLockType() == Exclusive) {
 		// Return highest type of lock type only
@@ -27,8 +34,10 @@ set<string> LockManager::testReadLock(Command* cmd) {
 
 	set<string> conflictingTransactions;
 	// Will read locks ever conflict?
-	if (lock != nullptr && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn->getId())
-			conflictingTransactions.insert(lock->getSoleLockOwner());
+    if (lock != nullptr && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn->getId())
+        conflictingTransactions.insert(lock->getSoleLockOwner());
+    if (lock != nullptr && lock->getLockType() == Shared && lock->getSoleLockOwner() != cmd->txn->getId())
+        conflictingTransactions.insert(lock->getSoleLockOwner());
 
 	return conflictingTransactions;
 }
@@ -117,14 +126,17 @@ bool LockManager::hasWriteLock(Command *cmd) {
 
 void LockManager::releaseAllLocks(Transaction* txn) {
 	for (auto & lock : locks) {
-		lock.second->removeTransaction(txn->getId());
+        if(lock.second)
+		    lock.second->removeTransaction(txn->getId());
 	}
 }
 
 set<string> LockManager::getConflictingTransactions(Command *cmd) {
-	if (cmd->type == Read) {
-		return testReadLock(cmd);
-	} else {
-		return testWriteLock(cmd);
-	}
+    set<string> res;
+    set<string> txnList = testReadLock(cmd);
+    res.insert(txnList.begin(), txnList.end());
+    txnList = testWriteLock(cmd);
+    res.insert(txnList.begin(), txnList.end());
+
+    return res;
 }
