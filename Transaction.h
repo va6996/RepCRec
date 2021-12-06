@@ -21,6 +21,7 @@ public:
 		map<string, set<int>> variableSite;
         map<string, int> variableWriteTime;
         bool isEnded;
+        string endMsg;
 
 		Transaction(string Id, int currTime, TxnType newType);
 		int getStartTime();

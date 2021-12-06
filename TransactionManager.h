@@ -26,6 +26,7 @@ class TransactionManager {
 		void executeWrite(Command *cmd);
 		void detectResolveDeadlock();
 		void checkWaitQueue();
+        bool canExecuteRW(Command *cmd);
 public:
 		TransactionManager(SiteManager *siteManager);
 
@@ -33,7 +34,7 @@ public:
 		void endTxn(string txnId);
 		void executeCmd(Command *cmd);
 		void beforeCommandChecks();
-		Transaction *getTxn(string txnId);
+        Transaction *getTxn(string txnId);
 };
 
 

@@ -9,7 +9,7 @@ int main(int argc, char** argv) {
 
 //    cout<<argv[1]<<"=====\n";
 //    ifstream inp(argv[1]);
-    ifstream inp("input/test22");
+    ifstream inp("input/test21");
 	if(inp.is_open()){
 		string line;
 		while(getline(inp, line)) {

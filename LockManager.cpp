@@ -36,8 +36,6 @@ set<string> LockManager::testReadLock(Command* cmd) {
 	// Will read locks ever conflict?
     if (lock != nullptr && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn->getId())
         conflictingTransactions.insert(lock->getSoleLockOwner());
-    if (lock != nullptr && lock->getLockType() == Shared && lock->getSoleLockOwner() != cmd->txn->getId())
-        conflictingTransactions.insert(lock->getSoleLockOwner());
 
 	return conflictingTransactions;
 }
@@ -80,8 +78,7 @@ set<string> LockManager::testWriteLock(Command* cmd) {
 	set<string> conflictingTransactions;
 	if (lock == nullptr)
 		return conflictingTransactions;
-
-	if (lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn->getId()) {
+	if (lock != nullptr && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn->getId()) {
 		// Return highest type of lock type only
 		conflictingTransactions.insert(lock->getSoleLockOwner());
 	}
@@ -90,7 +87,11 @@ set<string> LockManager::testWriteLock(Command* cmd) {
 		return lock->getTransactions();
 	}
 
-	return conflictingTransactions;
+    if (lock != nullptr && lock->getLockType() == Shared && lock->getLockOwnersSize()>0)
+        if(lock->getSoleLockOwner() != cmd->txn->getId())
+            conflictingTransactions.insert(lock->getSoleLockOwner());
+
+    return conflictingTransactions;
 }
 
 LockCodes LockManager::releaseLock(Command *cmd) {
@@ -132,11 +133,9 @@ void LockManager::releaseAllLocks(Transaction* txn) {
 }
 
 set<string> LockManager::getConflictingTransactions(Command *cmd) {
-    set<string> res;
-    set<string> txnList = testReadLock(cmd);
-    res.insert(txnList.begin(), txnList.end());
-    txnList = testWriteLock(cmd);
-    res.insert(txnList.begin(), txnList.end());
-
-    return res;
+    if (cmd->type == Read) {
+        return testReadLock(cmd);
+    } else {
+        return testWriteLock(cmd);
+    }
 }
