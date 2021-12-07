@@ -35,9 +35,13 @@ void TransactionManager::executeRead(Command *cmd) {
 	cout << cmd->txnId << (cmd->txn->getTxnType() == RO ? " ReadOnly Txn," : " ReadWrite Txn,") << " Reading "
 			 << cmd->var << "\n";
 	if (canExecuteRW(cmd)) {
-		string val = sm->read(cmd).first;
-		if (val != "")
+		auto result = sm->read(cmd);
+		string val = result.first;
+		if (!val.empty()) {
 			cout << cmd->txnId << " Reading " << cmd->var << ": " << val << "\n";
+			txnList[cmd->txnId]->addSites(cmd->var, {result.second});
+			txnList[cmd->txnId]->addWriteTimes(cmd->var, cmd->startTime);
+		}
 		else {
 			cout << cmd->txnId << " Reading " << cmd->var << " Failed\n";
 			set<string> conflictingTxn = sm->getConflictingLocks(cmd);
@@ -156,11 +160,14 @@ void TransactionManager::checkWaitQueue() {
 			if (!txn->isEnded) {
 				(*it1)->startTime = GlobalClock::getTime();
 				if ((*it1)->type == Read) {
-					string val = sm->read(*it1).first;
-					if (val != "") {
+					auto result = sm->read(*it1);
+					string val = result.first;
+					if (!val.empty()) {
 						Command *cmd = *it1;
 						cout << cmd->txnId << " Reading " << cmd->var << ": " << val << "\n";
 						canDelete = true;
+						txnList[cmd->txnId]->addSites(cmd->var, {result.second});
+						txnList[cmd->txnId]->addWriteTimes(cmd->var, cmd->startTime);
 						break;
 					}
 				} else {
