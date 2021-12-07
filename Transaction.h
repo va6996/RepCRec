@@ -28,7 +28,7 @@ public:
 		TxnType getTxnType();
 		string getId();
 		void addSites(string variable, vector<int> sites);
-        void addWriteTimes(string variable, int currTime);
+		void addWriteTimes(string variable, int currTime);
 };
 
 

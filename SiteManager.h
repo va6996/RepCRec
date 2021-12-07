@@ -17,7 +17,7 @@ class SiteManager {
 public:
 		SiteManager(const map<int, set<string>> &cfg);
 
-		string read(Command *cmd);
+		pair<string, int> read(Command *cmd);
 		LockCodes getWriteLock(Command *cmd);
 		set<string> getConflictingLocks(Command *cmd);
 		vector<int> stage(Command *cmd);
