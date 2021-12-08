@@ -54,12 +54,12 @@ LockCodes Site::releaseLock(Command *cmd) {
 	return lockManager->releaseLock(cmd);
 }
 
-string Site::read(Command *cmd) {
+pair<int, string> Site::read(Command *cmd) {
 	// Validate if lock exists?
 	return data[cmd->var]->getLatestValue();
 }
 
-string Site::read(Command *cmd, int time) {
+pair<int, string> Site::read(Command *cmd, int time) {
 	return data[cmd->var]->getLatestValue(time);
 }
 

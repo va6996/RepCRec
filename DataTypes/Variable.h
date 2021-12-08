@@ -20,9 +20,9 @@ class Variable {
 public:
 		Variable(string var, string value);
 
-		string getLatestValue();
+		pair<int, string> getLatestValue();
 
-		string getLatestValue(int time);
+		pair<int, string> getLatestValue(int time);
 
 		void stageValue(string newValue);
 

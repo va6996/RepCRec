@@ -42,14 +42,18 @@ pair<string, int> SiteManager::read(Command *cmd) {
 	for (int site: siteList) {
 		if (sites[site]->isSiteUp()) {
 			if (cmd->txn->getTxnType() == RO) {
-				string res = sites[site]->read(cmd, cmd->txn->getStartTime());
-				if (!res.empty())
-					return {res, site};
+				pair<int, string> res = sites[site]->read(cmd, cmd->txn->getStartTime());
+				int downTime = sites[site]->getLastDownTime();
+				bool isSingleOwner = soleOwner[site].find(cmd->var) != soleOwner[site].end();
+				if (isSingleOwner)
+					return {res.second, site};
+				if (downTime > cmd->txn->getStartTime() || downTime < res.first)
+					return {res.second, site};
 			} else {
 				// Same lock is acquired for multiple access to same variables in a transaction
 				LockCodes result = sites[site]->acquireLock(cmd);
 				if (result == SharedLockAcquired || result == ExclusiveLockAcquired) {
-					return {sites[site]->read(cmd), site};
+					return {sites[site]->read(cmd).second, site};
 				}
 			}
 		}
