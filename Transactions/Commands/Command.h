@@ -15,7 +15,7 @@ public:
 			var = "";
 			value = "";
 			txnId = "";
-			txn = NULL;
+			txn = nullptr;
 		}
 
 		CmdType type;

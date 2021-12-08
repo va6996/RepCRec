@@ -25,11 +25,11 @@ Driver::Driver() {
 //	gc = new GlobalClock();
 }
 
-void Driver::processLine(const string& line) {
+void Driver::processLine(const string &line) {
 	tm->beforeCommandChecks();
 
 	vector<string> tokens = getArgs(line);
-	if(tokens.size() != 0){
+	if (!tokens.empty()) {
 		if (tokens[0] == "beginRO") {
 			tm->beingTxn(tokens[1], RO, GlobalClock::getTime());
 		} else if (tokens[0] == "begin") {
@@ -37,7 +37,7 @@ void Driver::processLine(const string& line) {
 		} else if (tokens[0] == "end") {
 			tm->endTxn(tokens[1]);
 		} else if (tokens[0] == "W") {
-			Command *cmd = new Command();
+			auto *cmd = new Command();
 			cmd->txnId = tokens[1];
 			cmd->startTime = GlobalClock::getTime();
 			cmd->txn = tm->getTxn(cmd->txnId);
@@ -47,7 +47,7 @@ void Driver::processLine(const string& line) {
 
 			tm->executeCmd(cmd);
 		} else if (tokens[0] == "R") {
-			Command *cmd = new Command();
+			auto *cmd = new Command();
 			cmd->txnId = tokens[1];
 			cmd->startTime = GlobalClock::getTime();
 			cmd->txn = tm->getTxn(cmd->txnId);
@@ -57,23 +57,23 @@ void Driver::processLine(const string& line) {
 			tm->executeCmd(cmd);
 		} else if (tokens[0] == "fail") {
 			sm->fail(atoi(&tokens[1][0]));
-            tm->checkTxnForSiteFail(atoi(&tokens[1][0]));
-        } else if (tokens[0] == "recover") {
+			tm->checkTxnForSiteFail(atoi(&tokens[1][0]));
+		} else if (tokens[0] == "recover") {
 			sm->recover(atoi(&tokens[1][0]));
 		} else if (tokens[0] == "dump") {
 			sm->dump();
 		}
 	}
 
-    GlobalClock::tick();
+	GlobalClock::tick();
 }
 
 vector<string> Driver::getArgs(string str) {
 	char *tokens = strtok(&str[0], " (,)\n");
 	vector<string> args;
-	while(tokens!=NULL){
-		args.push_back(string(tokens));
-		tokens = strtok(NULL, " (,)\n");
+	while (tokens != nullptr) {
+		args.emplace_back(tokens);
+		tokens = strtok(nullptr, " (,)\n");
 	}
 	return args;
 }

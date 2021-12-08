@@ -111,7 +111,7 @@ void SiteManager::abort(Transaction *txn) {
 	}
 }
 
-void SiteManager::commit(Transaction *txn, const set<int> &commitSites, const string &var) {
+void SiteManager::commit(const set<int> &commitSites, const string &var) {
 	for (int site: commitSites) {
 		sites[site]->commit(var);
 	}
@@ -146,7 +146,8 @@ void SiteManager::dump() {
 		ss << "site " << site.first << ":- ";
 
 		vector<string> stringData;
-		for (auto &itt: siteData) {
+		stringData.reserve(siteData.size());
+for (auto &itt: siteData) {
 			stringData.push_back(itt.first + ": " + itt.second);
 		}
 		sort(stringData.begin(), stringData.end(), dataSort);

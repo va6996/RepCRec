@@ -15,7 +15,6 @@ void Site::fail() {
 void Site::recover() {
 	status = Up;
 	lockManager = new LockManager();
-	lastUpTime = GlobalClock::getTime();
 
 	for (auto it: data) {
 		if (singleOwner.find(it.first) == singleOwner.end()) {
@@ -28,20 +27,19 @@ bool Site::isSiteUp() {
 	return status == Up;
 }
 
-Site::Site(int nodeId, const set<string>& vars, const set<string> &singleOwnerVars) : nodeId(nodeId){
+Site::Site(int nodeId, const set<string> &vars, const set<string> &singleOwnerVars) : {
 	singleOwner = singleOwnerVars;
-	lastUpTime = GlobalClock::getTime();
 	lastDownTime = -1;
 	status = Up;
 	lockManager = new LockManager();
 	// Add init for all variables
-	for (const string& var : vars) {
+	for (const string &var: vars) {
 		int varNo = atoi(var.substr(1).c_str());
-		data[var] = new Variable(var, to_string(varNo*10));
+		data[var] = new Variable(var, to_string(varNo * 10));
 	}
 }
 
-LockCodes Site::acquireLock(Command* cmd) {
+LockCodes Site::acquireLock(Command *cmd) {
 	if (cmd->type == Read) {
 		if (data[cmd->var]->isDataStale()) {
 			return StaleData;
@@ -73,15 +71,15 @@ void Site::stage(Command *cmd) {
 	data[cmd->var]->stageValue(cmd->value);
 }
 
-void Site::commit(const string& var) {
+void Site::commit(const string &var) {
 	data[var]->commitStagedValue();
 }
 
 void Site::abort(Transaction *txn) {
-    lockManager->releaseAllLocks(txn);
+	lockManager->releaseAllLocks(txn);
 }
 
-int Site::getLastDownTime() {
+int Site::getLastDownTime() const {
 	return lastDownTime;
 }
 
@@ -92,7 +90,7 @@ set<string> Site::getConflictingTransactions(Command *cmd) {
 map<string, string> Site::getKeyValues() {
 	map<string, string> kvPairs;
 
-	for (auto & it : data) {
+	for (auto &it: data) {
 		kvPairs[it.first] = it.second->getLatestValue();
 	}
 

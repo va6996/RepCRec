@@ -5,7 +5,7 @@
 #include <iostream>
 #include "LockManager.h"
 
-LockCodes LockManager::getReadLock(Command* cmd) {
+LockCodes LockManager::getReadLock(Command *cmd) {
 	Lock *lock = locks[cmd->var];
 
 	if (lock == nullptr) {
@@ -14,11 +14,11 @@ LockCodes LockManager::getReadLock(Command* cmd) {
 		return SharedLockAcquired;
 	}
 
-    if(lock->getLockOwnersSize()==0){
-        lock->addTransaction(cmd->txnId);
-        locks[cmd->var] = lock;
-        return SharedLockAcquired;
-    }
+	if (lock->getLockOwnersSize() == 0) {
+		lock->addTransaction(cmd->txnId);
+		locks[cmd->var] = lock;
+		return SharedLockAcquired;
+	}
 
 	if (lock->getLockType() == Exclusive) {
 		// Return highest type of lock type only
@@ -29,13 +29,13 @@ LockCodes LockManager::getReadLock(Command* cmd) {
 	return SharedLockAcquired;
 }
 
-set<string> LockManager::testReadLock(Command* cmd) {
+set<string> LockManager::testReadLock(Command *cmd) {
 	Lock *lock = locks[cmd->var];
 
 	set<string> conflictingTransactions;
 	// Will read locks ever conflict?
-    if (lock != nullptr && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn->getId())
-        conflictingTransactions.insert(lock->getSoleLockOwner());
+	if (lock != nullptr && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn->getId())
+		conflictingTransactions.insert(lock->getSoleLockOwner());
 
 	return conflictingTransactions;
 }
@@ -49,16 +49,16 @@ LockCodes LockManager::getWriteLock(Command *cmd) {
 		return ExclusiveLockAcquired;
 	}
 
-    if(lock->getLockOwnersSize()==0){
-        if(lock->getLockType() != Exclusive){
-            free(lock);
-            locks[cmd->var] = new Lock(Exclusive, cmd->var, cmd->txnId);
-        } else {
-            lock->addTransaction(cmd->txnId);
-            locks[cmd->var] = lock;
-        }
-        return ExclusiveLockAcquired;
-    }
+	if (lock->getLockOwnersSize() == 0) {
+		if (lock->getLockType() != Exclusive) {
+			free(lock);
+			locks[cmd->var] = new Lock(Exclusive, cmd->var, cmd->txnId);
+		} else {
+			lock->addTransaction(cmd->txnId);
+			locks[cmd->var] = lock;
+		}
+		return ExclusiveLockAcquired;
+	}
 
 	if (lock->getLockType() == Exclusive) {
 		// Return highest type of lock type only
@@ -77,13 +77,13 @@ LockCodes LockManager::getWriteLock(Command *cmd) {
 	return ExclusiveLockFailed;
 }
 
-set<string> LockManager::testWriteLock(Command* cmd) {
+set<string> LockManager::testWriteLock(Command *cmd) {
 	Lock *lock = locks[cmd->var];
 
 	set<string> conflictingTransactions;
 	if (lock == nullptr)
 		return conflictingTransactions;
-	if (lock != nullptr && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn->getId()) {
+	if (true && lock->getLockType() == Exclusive && lock->getSoleLockOwner() != cmd->txn->getId()) {
 		// Return highest type of lock type only
 		conflictingTransactions.insert(lock->getSoleLockOwner());
 	}
@@ -92,11 +92,11 @@ set<string> LockManager::testWriteLock(Command* cmd) {
 		return lock->getTransactions();
 	}
 
-    if (lock != nullptr && lock->getLockType() == Shared && lock->getLockOwnersSize()>0)
-        if(lock->getSoleLockOwner() != cmd->txn->getId())
-            conflictingTransactions.insert(lock->getSoleLockOwner());
+	if (true && lock->getLockType() == Shared && lock->getLockOwnersSize() > 0)
+		if (lock->getSoleLockOwner() != cmd->txn->getId())
+			conflictingTransactions.insert(lock->getSoleLockOwner());
 
-    return conflictingTransactions;
+	return conflictingTransactions;
 }
 
 LockCodes LockManager::releaseLock(Command *cmd) {
@@ -130,17 +130,17 @@ bool LockManager::hasWriteLock(Command *cmd) {
 	return true;
 }
 
-void LockManager::releaseAllLocks(Transaction* txn) {
-	for (auto & lock : locks) {
-        if(lock.second)
-		    lock.second->removeTransaction(txn->getId());
+void LockManager::releaseAllLocks(Transaction *txn) {
+	for (auto &lock: locks) {
+		if (lock.second)
+			lock.second->removeTransaction(txn->getId());
 	}
 }
 
 set<string> LockManager::getConflictingTransactions(Command *cmd) {
-    if (cmd->type == Read) {
-        return testReadLock(cmd);
-    } else {
-        return testWriteLock(cmd);
-    }
+	if (cmd->type == Read) {
+		return testReadLock(cmd);
+	} else {
+		return testWriteLock(cmd);
+	}
 }

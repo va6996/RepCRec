@@ -9,32 +9,32 @@ TransactionManager::TransactionManager(SiteManager *siteManager) {
 	sm = siteManager;
 }
 
-void TransactionManager::beingTxn(string txnId, TxnType type, int currTime) {
-	Transaction *txn = new Transaction(txnId, currTime, type);
+void TransactionManager::beingTxn(const string& txnId, TxnType type, int currTime) {
+	auto *txn = new Transaction(txnId, currTime, type);
 	txnList.insert(make_pair(txnId, txn));
 }
 
 void TransactionManager::executeCmd(Command *cmd) {
-    if(cmd->txn->isEnded){
-        cout<<cmd->txnId<<" is already "<<cmd->txn->endMsg<<"\n";
-    } else {
-        if (Read == cmd->type)
-            executeRead(cmd);
-        else executeWrite(cmd);
-    }
+	if (cmd->txn->isEnded) {
+		cout << cmd->txnId << " is already " << cmd->txn->endMsg << "\n";
+	} else {
+		if (Read == cmd->type)
+			executeRead(cmd);
+		else executeWrite(cmd);
+	}
 }
 
 bool TransactionManager::canExecuteRW(Command *cmd) {
-    if(cmd->type==Read){
-        if(cmd->txn->variableReadSite.count(cmd->var))
-            return true;
-    } else {
-        if(cmd->txn->variableWriteSite.count(cmd->var))
-            return true;
-    }
+	if (cmd->type == Read) {
+		if (cmd->txn->variableReadSite.count(cmd->var))
+			return true;
+	} else {
+		if (cmd->txn->variableWriteSite.count(cmd->var))
+			return true;
+	}
 	if (waitQueue.count(cmd->var)) {
-		for (list<Command *>::iterator it = waitQueue[cmd->var]->begin(); it != waitQueue[cmd->var]->end(); it++) {
-			if (!(*it)->txn->isEnded) {
+		for (auto & it : *waitQueue[cmd->var]) {
+			if (!it->txn->isEnded) {
 				return false;
 			}
 		}
@@ -52,29 +52,28 @@ void TransactionManager::executeRead(Command *cmd) {
 			cout << cmd->txnId << " Reading " << cmd->var << ": " << val << "\n";
 			txnList[cmd->txnId]->addReadSites(cmd->var, {result.second});
 			txnList[cmd->txnId]->addReadTimes(cmd->var, cmd->startTime);
-		}
-		else {
+		} else {
 			cout << cmd->txnId << " Reading " << cmd->var << " Failed\n";
 			set<string> conflictingTxn = sm->getConflictingLocks(cmd);
-			for (set<string>::iterator it = conflictingTxn.begin(); it != conflictingTxn.end(); it++) {
-				dm->addEdge(cmd->txnId, *it);
+			for (const auto & it : conflictingTxn) {
+				dm->addEdge(cmd->txnId, it);
 			}
 
 			if (waitQueue.count(cmd->var)) {
-				for (list<Command *>::iterator it = waitQueue[cmd->var]->begin(); it != waitQueue[cmd->var]->end(); it++) {
+				for (auto it = waitQueue[cmd->var]->begin(); it != waitQueue[cmd->var]->end(); it++) {
 					if (!cmd->txn->isEnded)
 						dm->addEdge(cmd->txnId, (*it)->txnId);
 				}
 				waitQueue[cmd->var]->push_back(cmd);
 			} else {
-				list<Command *> *newW = new list<Command *>();
+				auto *newW = new list<Command *>();
 				newW->push_back(cmd);
 				waitQueue.insert(make_pair(cmd->var, newW));
 			}
 		}
 	} else {
 		cout << cmd->txnId << " Reading " << cmd->var << " Failed\n";
-		for (list<Command *>::iterator it = waitQueue[cmd->var]->begin(); it != waitQueue[cmd->var]->end(); it++) {
+		for (auto it = waitQueue[cmd->var]->begin(); it != waitQueue[cmd->var]->end(); it++) {
 			if (!(*it)->txn->isEnded) {
 				dm->addEdge(cmd->txnId, (*it)->txnId);
 			}
@@ -95,25 +94,25 @@ void TransactionManager::executeWrite(Command *cmd) {
 			cout << cmd->txnId << " Writing " << cmd->var << " Failed\n";
 			set<string> conflictingTxn = sm->getConflictingLocks(cmd);
 
-			for (set<string>::iterator it = conflictingTxn.begin(); it != conflictingTxn.end(); it++) {
-				dm->addEdge(cmd->txnId, *it);
+			for (const auto & it : conflictingTxn) {
+				dm->addEdge(cmd->txnId, it);
 			}
 
 			if (waitQueue.count(cmd->var)) {
-				for (list<Command *>::iterator it = waitQueue[cmd->var]->begin();
+				for (auto it = waitQueue[cmd->var]->begin();
 						 it != waitQueue[cmd->var]->end(); it++) {
 					dm->addEdge(cmd->txnId, (*it)->txnId);
 				}
 				waitQueue[cmd->var]->push_back(cmd);
 			} else {
-				list<Command *> *newW = new list<Command *>();
+				auto *newW = new list<Command *>();
 				newW->push_back(cmd);
 				waitQueue.insert(make_pair(cmd->var, newW));
 			}
 		}
 	} else {
 		cout << cmd->txnId << " Writing " << cmd->var << " Failed\n";
-		for (list<Command *>::iterator it = waitQueue[cmd->var]->begin();
+		for (auto it = waitQueue[cmd->var]->begin();
 				 it != waitQueue[cmd->var]->end(); it++) {
 			dm->addEdge(cmd->txnId, (*it)->txnId);
 		}
@@ -132,7 +131,7 @@ void TransactionManager::detectResolveDeadlock() {
 	}
 }
 
-void TransactionManager::endTxn(string txnId) {
+void TransactionManager::endTxn(const string& txnId) {
 	if (txnList[txnId]->isEnded) {
 		cout << txnId << " is already " << txnList[txnId]->endMsg << "\n";
 	} else {
@@ -140,15 +139,17 @@ void TransactionManager::endTxn(string txnId) {
 		txn->isEnded = true;
 
 		bool canWriteAll = true;
-		for (map<string, set<int>>::iterator it = txn->variableWriteSite.begin(); it != txn->variableWriteSite.end(); it++) {
+		for (auto it = txn->variableWriteSite.begin();
+				 it != txn->variableWriteSite.end(); it++) {
 			if (sm->wasSiteDownAfter(it->second, txn->variableWriteTime[it->first])) {
 				canWriteAll = false;
 				break;
 			}
 		}
 		if (canWriteAll) {
-			for (map<string, set<int>>::iterator it = txn->variableWriteSite.begin(); it != txn->variableWriteSite.end(); it++) {
-				sm->commit(txn, it->second, it->first);
+			for (auto it = txn->variableWriteSite.begin();
+					 it != txn->variableWriteSite.end(); it++) {
+				sm->commit(it->second, it->first);
 			}
 			sm->abort(txn);
 			cout << txnId << " Commited\n";
@@ -163,10 +164,10 @@ void TransactionManager::endTxn(string txnId) {
 }
 
 void TransactionManager::checkWaitQueue() {
-	for (map<string, list<Command *> *>::iterator it = waitQueue.begin(); it != waitQueue.end(); it++) {
+	for (auto & it : waitQueue) {
 		list<Command *>::iterator it1;
 		bool canDelete = false;
-		for (it1 = it->second->begin(); it1 != it->second->end(); it1++) {
+		for (it1 = it.second->begin(); it1 != it.second->end(); it1++) {
 			Transaction *txn = txnList[(*it1)->txnId];
 			if (!txn->isEnded) {
 				(*it1)->startTime = GlobalClock::getTime();
@@ -196,31 +197,31 @@ void TransactionManager::checkWaitQueue() {
 			}
 		}
 		if (canDelete)
-			it->second->erase(it1);
+			it.second->erase(it1);
 	}
 }
 
 void TransactionManager::beforeCommandChecks() {
-    detectResolveDeadlock();
+	detectResolveDeadlock();
 	checkWaitQueue();
 }
 
 void TransactionManager::checkTxnForSiteFail(int site) {
-    for(map<string, Transaction*>::iterator it = txnList.begin(); it != txnList.end(); it++){
-        if(!it->second->isEnded){
-            if(it->second->readSiteContains(site) || it->second->writeSiteContains(site)){
-                sm->abort(it->second);
-                dm->removeTransaction(it->first);
-                it->second->isEnded = true;
-                it->second->endMsg = "Aborted as a site failed";
-                cout<<it->first<<" Will abort as a site failed\n";
-            }
-        }
-    }
+	for (map<string, Transaction *>::iterator it = txnList.begin(); it != txnList.end(); it++) {
+		if (!it->second->isEnded) {
+			if (it->second->readSiteContains(site) || it->second->writeSiteContains(site)) {
+				sm->abort(it->second);
+				dm->removeTransaction(it->first);
+				it->second->isEnded = true;
+				it->second->endMsg = "Aborted as a site failed";
+				cout << it->first << " Will abort as a site failed\n";
+			}
+		}
+	}
 }
 
-Transaction *TransactionManager::getTxn(string txnId) {
+Transaction *TransactionManager::getTxn(const string& txnId) {
 	if (txnList.count(txnId))
 		return txnList[txnId];
-	return NULL;
+	return nullptr;
 }

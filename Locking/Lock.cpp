@@ -5,18 +5,18 @@
 #include "Lock.h"
 
 #include <utility>
-#include <assert.h>
+#include <cassert>
 
-Lock::Lock(LockType type, string var, const string& txnId) : type(type), var(std::move(var)) {
+Lock::Lock(LockType type, string var, const string &txnId) : type(type), var(std::move(var)) {
 	transactions.insert(txnId);
 }
 
-bool Lock::addTransaction(const string& txnId) {
+bool Lock::addTransaction(const string &txnId) {
 	transactions.insert(txnId);
 	return true;
 }
 
-bool Lock::removeTransaction(const string& txnId) {
+bool Lock::removeTransaction(const string &txnId) {
 	if (transactions.find(txnId) == transactions.end())
 		return false;
 
@@ -30,7 +30,7 @@ LockType Lock::getLockType() {
 
 string Lock::getSoleLockOwner() {
 	assert(transactions.size() == 1);
-    return *transactions.begin();
+	return *transactions.begin();
 }
 
 int Lock::getLockOwnersSize() {
