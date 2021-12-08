@@ -7,14 +7,14 @@
 #include <utility>
 #include "../Clock/GlobalClock.h"
 
-string Variable::getLatestValue() {
+pair<int, string> Variable::getLatestValue() {
 	if (value.empty()) return {};
-	return value.back().second;
+	return value.back();
 }
 
-string Variable::getLatestValue(int time) {
+pair<int, string> Variable::getLatestValue(int time) {
 	for (auto it = value.rbegin(); it != value.rend(); it++) {
-		if (it->first <= time) return it->second;
+		if (it->first <= time) return *it;
 	}
 	return {};
 }

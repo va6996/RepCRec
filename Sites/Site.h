@@ -34,9 +34,9 @@ public:
 
 		bool isSiteUp();
 
-		string read(Command *cmd);
+		pair<int, string> read(Command *cmd);
 
-		string read(Command *cmd, int time);
+		pair<int, string> read(Command *cmd, int time);
 
 		void stage(Command *cmd);
 
