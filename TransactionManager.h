@@ -1,5 +1,5 @@
 //
-// Created by Vinayak Agarwal on 12/4/21.
+// Created by Anurag Gupta on 12/4/21.
 //
 
 #ifndef REPCREC_TRANSACTIONMANAGER_H
@@ -34,6 +34,7 @@ public:
 		void endTxn(string txnId);
 		void executeCmd(Command *cmd);
 		void beforeCommandChecks();
+        void checkTxnForSiteFail(int site);
         Transaction *getTxn(string txnId);
 };
 

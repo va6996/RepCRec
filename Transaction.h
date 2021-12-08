@@ -1,5 +1,5 @@
 //
-// Created by Vinayak Agarwal on 12/4/21.
+// Created by Anurag Gupta on 12/4/21.
 //
 
 #ifndef REPCREC_TRANSACTION_H
@@ -18,8 +18,10 @@ class Transaction {
 		TxnType type;
 
 public:
-		map<string, set<int>> variableSite;
+		map<string, set<int>> variableWriteSite;
         map<string, int> variableWriteTime;
+        map<string, set<int>> variableReadSite;
+        map<string, int> variableReadTime;
         bool isEnded;
         string endMsg;
 
@@ -27,8 +29,12 @@ public:
 		int getStartTime();
 		TxnType getTxnType();
 		string getId();
-		void addSites(string variable, vector<int> sites);
-		void addWriteTimes(string variable, int currTime);
+        void addWriteSites(string variable, vector<int> sites);
+        void addWriteTimes(string variable, int currTime);
+        void addReadSites(string variable, vector<int> sites);
+        void addReadTimes(string variable, int currTime);
+        bool writeSiteContains(int site);
+        bool readSiteContains(int site);
 };
 
 

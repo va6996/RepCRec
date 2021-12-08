@@ -1,5 +1,5 @@
 //
-// Created by Vinayak Agarwal on 12/4/21.
+// Created by Anurag Gupta on 12/4/21.
 //
 
 #include "Driver.h"
@@ -57,7 +57,8 @@ void Driver::processLine(const string& line) {
 			tm->executeCmd(cmd);
 		} else if (tokens[0] == "fail") {
 			sm->fail(atoi(&tokens[1][0]));
-		} else if (tokens[0] == "recover") {
+            tm->checkTxnForSiteFail(atoi(&tokens[1][0]));
+        } else if (tokens[0] == "recover") {
 			sm->recover(atoi(&tokens[1][0]));
 		} else if (tokens[0] == "dump") {
 			sm->dump();

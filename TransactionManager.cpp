@@ -1,5 +1,5 @@
 //
-// Created by Vinayak Agarwal on 12/4/21.
+// Created by Anurag Gupta on 12/4/21.
 //
 
 #include "TransactionManager.h"
@@ -15,9 +15,13 @@ void TransactionManager::beingTxn(string txnId, TxnType type, int currTime) {
 }
 
 void TransactionManager::executeCmd(Command *cmd) {
-	if (Read == cmd->type)
-		executeRead(cmd);
-	else executeWrite(cmd);
+    if(cmd->txn->isEnded){
+        cout<<cmd->txnId<<" is already "<<cmd->txn->endMsg<<"\n";
+    } else {
+        if (Read == cmd->type)
+            executeRead(cmd);
+        else executeWrite(cmd);
+    }
 }
 
 bool TransactionManager::canExecuteRW(Command *cmd) {
@@ -39,8 +43,8 @@ void TransactionManager::executeRead(Command *cmd) {
 		string val = result.first;
 		if (!val.empty()) {
 			cout << cmd->txnId << " Reading " << cmd->var << ": " << val << "\n";
-			txnList[cmd->txnId]->addSites(cmd->var, {result.second});
-			txnList[cmd->txnId]->addWriteTimes(cmd->var, cmd->startTime);
+			txnList[cmd->txnId]->addReadSites(cmd->var, {result.second});
+			txnList[cmd->txnId]->addReadTimes(cmd->var, cmd->startTime);
 		}
 		else {
 			cout << cmd->txnId << " Reading " << cmd->var << " Failed\n";
@@ -78,7 +82,7 @@ void TransactionManager::executeWrite(Command *cmd) {
 		if (sm->getWriteLock(cmd) == ExclusiveLockAcquired) {
 			cout << cmd->txnId << " " << cmd->var << " Written, Value:" << cmd->value << "\n";
 			vector<int> writeSite = sm->stage(cmd);
-			txnList[cmd->txnId]->addSites(cmd->var, writeSite);
+			txnList[cmd->txnId]->addWriteSites(cmd->var, writeSite);
 			txnList[cmd->txnId]->addWriteTimes(cmd->var, cmd->startTime);
 		} else {
 			cout << cmd->txnId << " Writing " << cmd->var << " Failed\n";
@@ -129,14 +133,14 @@ void TransactionManager::endTxn(string txnId) {
 		txn->isEnded = true;
 
 		bool canWriteAll = true;
-		for (map<string, set<int>>::iterator it = txn->variableSite.begin(); it != txn->variableSite.end(); it++) {
+		for (map<string, set<int>>::iterator it = txn->variableWriteSite.begin(); it != txn->variableWriteSite.end(); it++) {
 			if (sm->wasSiteDownAfter(it->second, txn->variableWriteTime[it->first])) {
 				canWriteAll = false;
 				break;
 			}
 		}
 		if (canWriteAll) {
-			for (map<string, set<int>>::iterator it = txn->variableSite.begin(); it != txn->variableSite.end(); it++) {
+			for (map<string, set<int>>::iterator it = txn->variableWriteSite.begin(); it != txn->variableWriteSite.end(); it++) {
 				sm->commit(txn, it->second, it->first);
 			}
 			sm->abort(txn);
@@ -166,8 +170,8 @@ void TransactionManager::checkWaitQueue() {
 						Command *cmd = *it1;
 						cout << cmd->txnId << " Reading " << cmd->var << ": " << val << "\n";
 						canDelete = true;
-						txnList[cmd->txnId]->addSites(cmd->var, {result.second});
-						txnList[cmd->txnId]->addWriteTimes(cmd->var, cmd->startTime);
+						txnList[cmd->txnId]->addReadSites(cmd->var, {result.second});
+						txnList[cmd->txnId]->addReadTimes(cmd->var, cmd->startTime);
 						break;
 					}
 				} else {
@@ -176,7 +180,7 @@ void TransactionManager::checkWaitQueue() {
 					if (lockType == ExclusiveLockAcquired) {
 						cout << cmd->txnId << " " << cmd->var << " Written, Value:" << cmd->value << "\n";
 						vector<int> writeSite = sm->stage(cmd);
-						txnList[cmd->txnId]->addSites(cmd->var, writeSite);
+						txnList[cmd->txnId]->addWriteSites(cmd->var, writeSite);
 						txnList[cmd->txnId]->addWriteTimes(cmd->var, cmd->startTime);
 						canDelete = true;
 					}
@@ -190,8 +194,22 @@ void TransactionManager::checkWaitQueue() {
 }
 
 void TransactionManager::beforeCommandChecks() {
-	detectResolveDeadlock();
+    detectResolveDeadlock();
 	checkWaitQueue();
+}
+
+void TransactionManager::checkTxnForSiteFail(int site) {
+    for(map<string, Transaction*>::iterator it = txnList.begin(); it != txnList.end(); it++){
+        if(!it->second->isEnded){
+            if(it->second->readSiteContains(site) || it->second->writeSiteContains(site)){
+                sm->abort(it->second);
+                dm->removeTransaction(it->first);
+                it->second->isEnded = true;
+                it->second->endMsg = "Aborted as a site failed";
+                cout<<it->first<<" Will abort as a site failed\n";
+            }
+        }
+    }
 }
 
 Transaction *TransactionManager::getTxn(string txnId) {
