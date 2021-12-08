@@ -207,7 +207,7 @@ void TransactionManager::beforeCommandChecks() {
 
 void TransactionManager::checkTxnForSiteFail(int site) {
     for(map<string, Transaction*>::iterator it = txnList.begin(); it != txnList.end(); it++){
-        if(!it->second->isEnded){
+        if(!it->second->isEnded && it->second->getTxnType()==RW){
             if(it->second->readSiteContains(site) || it->second->writeSiteContains(site)){
                 sm->abort(it->second);
                 dm->removeTransaction(it->first);
