@@ -5,7 +5,9 @@
 #ifndef REPCREC_CMDTYPE_H
 #define REPCREC_CMDTYPE_H
 
-
+/**
+ * Types of commands
+ */
 enum CmdType {
 	Read, Write, Begin, End, Fail, Recover, BeginRO, None
 };

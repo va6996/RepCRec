@@ -5,7 +5,9 @@
 #ifndef REPCREC_TXNTYPE_H
 #define REPCREC_TXNTYPE_H
 
-
+/**
+ * Types of Transactions
+ */
 enum TxnType {
 	RW, RO
 };

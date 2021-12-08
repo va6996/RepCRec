@@ -9,6 +9,9 @@
 #include "CmdType.h"
 #include "../Transaction.h"
 
+/**
+ * Class responsible for storing details about the current command
+ */
 class Command {
 public:
 		Command() {

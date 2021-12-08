@@ -13,23 +13,66 @@
 
 using namespace std;
 
+/**
+ * Class responsible for creating wait-for graph
+ * and detecting if there is a cycle present in the graph
+ * If a cycle is detected, return the youngest TXN.
+ */
 class DeadlockManager {
-		map<string, set<string>> adjacencyList;
-		set<string> nodeList;
+    map<string, set<string>> adjacencyList;
+    set<string> nodeList;
 
+    /**
+     * Detects is a cycle is present in the graph
+     * @param txn current node to be checked
+     * @param visited map of nodes visited for cycle check
+     * @param recStack current path for cycle check function call
+     * @return true if a cycle is present, otherwise it returns false
+     */
+    bool isCycleRec(const string& txn, map<string, bool> &visited, map<string, bool> &recStack);
+
+    /**
+     * Function to detect and get the set of txns
+     * in a cycle. The function is called when
+     * a deadlock is present.
+     * @param txn cureent node to be checked
+     * @param visited map of nodes visited for cycle check
+     * @param recStack current path for cycle check
+     * @param txnDetails details of all txns
+     * @param currP current set of txns in the path to curr node
+     * @return array of txns in a cycle
+     */
+    vector<string> minTransRec(const string& txn, map<string, bool> &visited, map<string, bool> &recStack,
+                               map<string, Transaction *> &txnDetails, vector<string> currP);
 public:
-		void addEdge(const string& t1, const string& t2);
+    /**
+     * Adds a edge between node t1 and t2
+     * @param t1 source node
+     * @param t2 destination node
+     */
+    void addEdge(const string& t1, const string& t2);
 
-		void removeTransaction(const string& txn);
+    /**
+     * When a txn ends, this func removes all
+     * the edges from and to the node txn from the graph
+     * @param txn node to be removed
+     */
+    void removeTransaction(const string& txn);
 
-		bool isCycleRec(const string& txn, map<string, bool> &visited, map<string, bool> &recStack);
+    /**
+     * Checks if deadlock is present in the
+     * graph by checking if cycle is present in the graph
+     * @return true if deadlock is present, otherwise returns false
+     */
+    bool detectDeadlock();
 
-		bool detectDeadlock();
-
-		vector<string> minTransRec(const string& txn, map<string, bool> &visited, map<string, bool> &recStack,
-															 map<string, Transaction *> &txnDetails, vector<string> currP);
-
-		string resolveDeadlock(map<string, Transaction *> &txn);
+    /**
+     * If a deadlock is present, then the function
+     * returns the youngest txn from the set of txns causing deadlock
+     * @param txn contains information about all the txns
+     * @return name of the youngest txn causing deadlock
+     */
+    string resolveDeadlock(map<string, Transaction *> &txn);
 };
 
 #endif //REPCREC_DEADLOCKMANAGER_H

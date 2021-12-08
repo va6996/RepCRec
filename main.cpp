@@ -4,12 +4,9 @@
 
 int main(int argc, char **argv) {
 	auto *d = new Driver();
-//	if(argc<2)
-//		cout<<"FileName Missing\n";
 
-//    ifstream inp(argv[1]);
 	string fileName;
-	cout << "Enter Input File Name:";
+	cout << "Enter the full path for Input File:";
 	cin >> fileName;
 	ifstream inp(fileName);
 	if (inp.is_open()) {
