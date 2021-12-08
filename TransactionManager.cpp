@@ -25,6 +25,13 @@ void TransactionManager::executeCmd(Command *cmd) {
 }
 
 bool TransactionManager::canExecuteRW(Command *cmd) {
+    if(cmd->type==Read){
+        if(cmd->txn->variableReadSite.count(cmd->var))
+            return true;
+    } else {
+        if(cmd->txn->variableWriteSite.count(cmd->var))
+            return true;
+    }
 	if (waitQueue.count(cmd->var)) {
 		for (list<Command *>::iterator it = waitQueue[cmd->var]->begin(); it != waitQueue[cmd->var]->end(); it++) {
 			if (!(*it)->txn->isEnded) {
