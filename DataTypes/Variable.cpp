@@ -25,7 +25,7 @@ void Variable::stageValue(string newValue) {
 }
 
 void Variable::commitStagedValue() {
-	value.emplace_back(stagingTime, stagedValue);
+	value.emplace_back(GlobalClock::getTime(), stagedValue);
 	isStale = false;
 }
 
