@@ -5,7 +5,9 @@
 #ifndef REPCREC_LOCKTYPE_H
 #define REPCREC_LOCKTYPE_H
 
-
+/**
+ * Types of locks
+ */
 enum LockType {
 	Shared, Exclusive
 };
