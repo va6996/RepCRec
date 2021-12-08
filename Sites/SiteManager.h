@@ -27,7 +27,7 @@ public:
 
 		void abort(Transaction *txn);
 
-		void commit(const set<int> &commitSites, const string &var);
+		void commit(set<int> commitSites, string var);
 
 		bool wasSiteDownAfter(set<int> sites, int time);
 

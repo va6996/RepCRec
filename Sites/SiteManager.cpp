@@ -111,7 +111,7 @@ void SiteManager::abort(Transaction *txn) {
 	}
 }
 
-void SiteManager::commit(const set<int> &commitSites, const string &var) {
+void SiteManager::commit(set<int> commitSites, string var) {
 	for (int site: commitSites) {
 		sites[site]->commit(var);
 	}

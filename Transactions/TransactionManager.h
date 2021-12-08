@@ -35,9 +35,9 @@ class TransactionManager {
 public:
 		TransactionManager(SiteManager *siteManager);
 
-		void beingTxn(const string& txnId, TxnType type, int currTime);
+		void beingTxn(string txnId, TxnType type, int currTime);
 
-		void endTxn(const string& txnId);
+		void endTxn(string txnId);
 
 		void executeCmd(Command *cmd);
 
@@ -45,7 +45,7 @@ public:
 
 		void checkTxnForSiteFail(int site);
 
-		Transaction *getTxn(const string& txnId);
+		Transaction *getTxn(string txnId);
 };
 
 

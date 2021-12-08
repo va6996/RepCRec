@@ -27,7 +27,7 @@ bool Site::isSiteUp() {
 	return status == Up;
 }
 
-Site::Site(int nodeId, const set<string> &vars, const set<string> &singleOwnerVars) : {
+Site::Site(int nodeId, const set<string> &vars, const set<string> &singleOwnerVars) {
 	singleOwner = singleOwnerVars;
 	lastDownTime = -1;
 	status = Up;

@@ -148,7 +148,7 @@ void TransactionManager::endTxn(string txnId) {
 		}
 		if (canWriteAll) {
 			for (map<string, set<int>>::iterator it = txn->variableWriteSite.begin(); it != txn->variableWriteSite.end(); it++) {
-				sm->commit(txn, it->second, it->first);
+				sm->commit(it->second, it->first);
 			}
 			sm->abort(txn);
 			cout << txnId << " Commited\n";
