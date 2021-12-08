@@ -21,12 +21,16 @@ public:
 		Variable(string var, string value);
 
 		string getLatestValue();
+
 		string getLatestValue(int time);
+
 		void stageValue(string newValue);
+
 		void commitStagedValue();
 
 		void markStale();
-		bool isDataStale();
+
+		bool isDataStale() const;
 };
 
 #endif //REPCREC_VARIABLE_H

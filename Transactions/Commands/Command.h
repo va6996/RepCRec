@@ -7,7 +7,7 @@
 
 
 #include "CmdType.h"
-#include "Transaction.h"
+#include "../Transaction.h"
 
 class Command {
 public:
@@ -15,7 +15,7 @@ public:
 			var = "";
 			value = "";
 			txnId = "";
-			txn = NULL;
+			txn = nullptr;
 		}
 
 		CmdType type;

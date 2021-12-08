@@ -6,38 +6,48 @@
 #define REPCREC_SITE_H
 
 
-#include "Variable.h"
-#include "LockManager.h"
+#include "../DataTypes/Variable.h"
+#include "../Locking/LockManager.h"
 #include "SiteStatus.h"
 
 class Site {
 		int nodeId;
 		SiteStatus status;
-		map<string, Variable*> data;
+		map<string, Variable *> data;
 		set<string> singleOwner;
-		LockManager* lockManager;
+		LockManager *lockManager;
 		int lastDownTime;
 		int lastUpTime;
 
 public:
-		Site(int nodeId, const set<string>& vars, const set<string> &singleOwnerVars);
+		Site(int nodeId, const set<string> &vars, const set<string> &singleOwnerVars);
 
 		void fail();
 
 		void recover();
 
-		LockCodes acquireLock(Command* cmd);
-		LockCodes releaseLock(Command* cmd);
+		LockCodes acquireLock(Command *cmd);
+
+		LockCodes releaseLock(Command *cmd);
+
 		bool hasWriteLock(Command *cmd);
 
 		bool isSiteUp();
+
 		string read(Command *cmd);
+
 		string read(Command *cmd, int time);
+
 		void stage(Command *cmd);
-		void commit(const string& var);
+
+		void commit(const string &var);
+
 		void abort(Transaction *txn);
-		int getLastDownTime();
-		set<string> getConflictingTransactions(Command* cmd);
+
+		int getLastDownTime() const;
+
+		set<string> getConflictingTransactions(Command *cmd);
+
 		map<string, string> getKeyValues();
 };
 

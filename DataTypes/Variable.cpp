@@ -5,7 +5,7 @@
 #include "Variable.h"
 
 #include <utility>
-#include "GlobalClock.h"
+#include "../Clock/GlobalClock.h"
 
 string Variable::getLatestValue() {
 	if (value.empty()) return {};
@@ -13,7 +13,7 @@ string Variable::getLatestValue() {
 }
 
 string Variable::getLatestValue(int time) {
-	for (auto it=value.rbegin(); it!=value.rend();it++) {
+	for (auto it = value.rbegin(); it != value.rend(); it++) {
 		if (it->first <= time) return it->second;
 	}
 	return {};
@@ -38,7 +38,7 @@ void Variable::markStale() {
 	isStale = true;
 }
 
-bool Variable::isDataStale() {
+bool Variable::isDataStale() const {
 	return isStale;
 }
 

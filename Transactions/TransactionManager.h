@@ -6,12 +6,12 @@
 #define REPCREC_TRANSACTIONMANAGER_H
 
 #include <deque>
-#include "Command.h"
-#include "DeadlockManager.h"
+#include "Commands/Command.h"
+#include "../Deadlocks/DeadlockManager.h"
 #include "Transaction.h"
-#include "SiteManager.h"
+#include "../Sites/SiteManager.h"
 #include <iostream>
-#include "GlobalClock.h"
+#include "../Clock/GlobalClock.h"
 
 using namespace std;
 
@@ -23,19 +23,29 @@ class TransactionManager {
 		map<string, Transaction *> txnList;
 
 		void executeRead(Command *cmd);
+
 		void executeWrite(Command *cmd);
+
 		void detectResolveDeadlock();
+
 		void checkWaitQueue();
-        bool canExecuteRW(Command *cmd);
+
+		bool canExecuteRW(Command *cmd);
+
 public:
 		TransactionManager(SiteManager *siteManager);
 
-		void beingTxn(string txnId, TxnType type, int currTime);
-		void endTxn(string txnId);
+		void beingTxn(const string& txnId, TxnType type, int currTime);
+
+		void endTxn(const string& txnId);
+
 		void executeCmd(Command *cmd);
+
 		void beforeCommandChecks();
-        void checkTxnForSiteFail(int site);
-        Transaction *getTxn(string txnId);
+
+		void checkTxnForSiteFail(int site);
+
+		Transaction *getTxn(const string& txnId);
 };
 
 
