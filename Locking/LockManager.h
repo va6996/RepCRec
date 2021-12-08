@@ -7,7 +7,7 @@
 
 #include <map>
 #include "Lock.h"
-#include "Command.h"
+#include "../Transactions/Commands/Command.h"
 #include "LockCodes.h"
 
 class LockManager {

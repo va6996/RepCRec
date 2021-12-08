@@ -3,7 +3,7 @@
 //
 
 #include "Site.h"
-#include "GlobalClock.h"
+#include "../Clock/GlobalClock.h"
 
 void Site::fail() {
 	status = Down;

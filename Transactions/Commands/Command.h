@@ -7,7 +7,7 @@
 
 
 #include "CmdType.h"
-#include "Transaction.h"
+#include "../Transaction.h"
 
 class Command {
 public:

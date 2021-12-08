@@ -6,8 +6,8 @@
 #define REPCREC_SITE_H
 
 
-#include "Variable.h"
-#include "LockManager.h"
+#include "../DataTypes/Variable.h"
+#include "../Locking/LockManager.h"
 #include "SiteStatus.h"
 
 class Site {

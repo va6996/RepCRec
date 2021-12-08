@@ -6,12 +6,12 @@
 #define REPCREC_TRANSACTIONMANAGER_H
 
 #include <deque>
-#include "Command.h"
-#include "DeadlockManager.h"
+#include "Commands/Command.h"
+#include "../Deadlocks/DeadlockManager.h"
 #include "Transaction.h"
-#include "SiteManager.h"
+#include "../Sites/SiteManager.h"
 #include <iostream>
-#include "GlobalClock.h"
+#include "../Clock/GlobalClock.h"
 
 using namespace std;
 

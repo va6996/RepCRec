@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include "Driver.h"
+#include "Driver/Driver.h"
 
 int main(int argc, char** argv) {
 	Driver *d = new Driver();

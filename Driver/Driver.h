@@ -6,9 +6,9 @@
 #define REPCREC_DRIVER_H
 
 
-#include "TransactionManager.h"
-#include "SiteManager.h"
-#include "GlobalClock.h"
+#include "../Transactions/TransactionManager.h"
+#include "../Sites/SiteManager.h"
+#include "../Clock/GlobalClock.h"
 #include <string.h>
 
 

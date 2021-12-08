@@ -3,4 +3,4 @@ project(RepCRec)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(RepCRec main.cpp CmdType.h  TxnType.h LockType.h  ErrorCodes.h DeadlockManager.cpp DeadlockManager.h Variable.cpp Variable.h Lock.cpp Lock.h Transaction.cpp Transaction.h Command.cpp Command.h LockManager.cpp LockManager.h Site.cpp Site.h SiteManager.cpp SiteManager.h TransactionManager.cpp TransactionManager.h Driver.cpp Driver.h SiteStatus.h GlobalClock.cpp GlobalClock.h LockCodes.h)
+add_executable(RepCRec main.cpp Transactions/Commands/CmdType.h Transactions/TxnType.h Locking/LockType.h ErrorCodes.h Deadlocks/DeadlockManager.cpp Deadlocks/DeadlockManager.h DataTypes/Variable.cpp DataTypes/Variable.h Locking/Lock.cpp Locking/Lock.h Transactions/Transaction.cpp Transactions/Transaction.h Transactions/Commands/Command.cpp Transactions/Commands/Command.h Locking/LockManager.cpp Locking/LockManager.h Sites/Site.cpp Sites/Site.h Sites/SiteManager.cpp Sites/SiteManager.h Transactions/TransactionManager.cpp Transactions/TransactionManager.h Driver/Driver.cpp Driver/Driver.h Sites/SiteStatus.h Clock/GlobalClock.cpp Clock/GlobalClock.h Locking/LockCodes.h)

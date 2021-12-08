@@ -8,7 +8,7 @@
 #include <map>
 #include <set>
 #include <list>
-#include "Lock.h"
+#include "../Locking/Lock.h"
 #include "TxnType.h"
 
 class Transaction {

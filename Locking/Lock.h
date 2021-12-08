@@ -7,7 +7,7 @@
 
 #include <set>
 #include "LockType.h"
-#include "Variable.h"
+#include "../DataTypes/Variable.h"
 
 class Lock {
 		LockType type;

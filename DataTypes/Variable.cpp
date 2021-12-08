@@ -5,7 +5,7 @@
 #include "Variable.h"
 
 #include <utility>
-#include "GlobalClock.h"
+#include "../Clock/GlobalClock.h"
 
 string Variable::getLatestValue() {
 	if (value.empty()) return {};
